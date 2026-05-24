@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#060a12" />
+  <title>DANGER CARD — Elimination Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- CONFIRM MODAL (shared) -->
+  <div id="confirmModal" class="modal-backdrop" style="display:none">
+    <div class="modal-box glass-panel">
+      <div class="modal-icon" id="modalIcon">⚠️</div>
+      <h3 class="modal-title" id="modalTitle">Are you sure?</h3>
+      <p class="modal-msg" id="modalMsg">This action cannot be undone.</p>
+      <div class="modal-btns">
+        <button class="btn-modal-cancel" id="modalCancel">Cancel</button>
+        <button class="btn-modal-confirm" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app">
+
+    <!-- START SCREEN -->
+    <div id="screen-start" class="screen active">
+      <div class="start-scroll">
+        <div class="start-inner">
+          <div class="logo-wrap">
+            <div class="logo-icon-wrap">
+              <span class="logo-icon">💣</span>
+            </div>
+            <h1 class="logo-title">DANGER<span class="logo-card">CARD</span></h1>
+            <p class="logo-tagline">Pick a card. Pray it's not the one.</p>
+          </div>
+
+          <div class="setup-card glass-panel">
+            <label class="field-label">NUMBER OF PLAYERS</label>
+            <div class="player-count-row">
+              <button class="count-btn" id="btnDecCount">&#x2212;</button>
+              <div class="count-display-wrap">
+                <span class="count-display" id="playerCountDisplay">2</span>
+                <span class="count-sub">players</span>
+              </div>
+              <button class="count-btn" id="btnIncCount">+</button>
+            </div>
+            <div id="nameInputs" class="name-inputs"></div>
+            <button class="btn-primary" id="btnStart">
+              <span>START GAME</span>
+              <span class="btn-icon">&#x25B6;</span>
+            </button>
+          </div>
+
+          <div class="leaderboard-wrap glass-panel" id="leaderboardPanel">
+            <h3 class="lb-title">&#x1F3C6; WIN HISTORY</h3>
+            <div id="leaderboardList" class="lb-list"></div>
+            <button class="btn-ghost btn-danger-ghost" id="btnClearHistory">Clear History</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYER TURN SCREEN -->
+    <div id="screen-turn" class="screen">
+      <div class="turn-header">
+        <div class="turn-header-top">
+          <div class="round-badge" id="roundBadge">ROUND 1</div>
+          <div class="cards-info-badge" id="cardsInfoBadge">3 CARDS &middot; 1 BOMB</div>
+          <button class="btn-exit-game" id="btnExitTurn" title="Exit game">&#x2715;</button>
+        </div>
+        <h2 class="turn-title" id="turnTitle">Player's Turn</h2>
+        <p class="turn-subtitle">Choose your card wisely&hellip;</p>
+        <div class="players-remaining" id="playersRemaining"></div>
+      </div>
+      <div class="cards-area" id="cardsArea"></div>
+      <div class="turn-footer">
+        <div class="progress-dots" id="progressDots"></div>
+      </div>
+    </div>
+
+    <!-- PASS DEVICE SCREEN -->
+    <div id="screen-pass" class="screen">
+      <button class="btn-exit-game btn-exit-float" id="btnExitPass" title="Exit game">&#x2715;</button>
+      <div class="pass-inner">
+        <div class="pass-icon">&#x1F4F1;</div>
+        <h2 class="pass-title">PASS THE PHONE</h2>
+        <p class="pass-subtitle" id="passSubtitle">Hand it to the next player</p>
+        <div class="pass-player" id="passNextPlayer"></div>
+        <button class="btn-primary btn-ready" id="btnReady">
+          <span>READY</span>
+          <span class="btn-icon">&#x2713;</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- REVEAL SCREEN -->
+    <div id="screen-reveal" class="screen">
+      <div class="reveal-header">
+        <div class="reveal-header-top">
+          <div class="round-badge" id="revealRoundBadge">ROUND 1</div>
+          <button class="btn-exit-game" id="btnExitReveal" title="Exit game">&#x2715;</button>
+        </div>
+        <h2 class="reveal-title" id="revealTitle">REVEALING CARDS</h2>
+      </div>
+      <div class="reveal-cards-area" id="revealCardsArea"></div>
+      <div class="reveal-result" id="revealResult">
+        <div class="explosion-ring" id="explosionRing"></div>
+        <div class="eliminated-msg" id="eliminatedMsg"></div>
+      </div>
+      <button class="btn-primary btn-continue" id="btnContinue" style="display:none">
+        <span id="continueLabel">NEXT ROUND</span>
+        <span class="btn-icon">&#x2192;</span>
+      </button>
+    </div>
+
+    <!-- WINNER SCREEN -->
+    <div id="screen-winner" class="screen">
+      <canvas id="confettiCanvas"></canvas>
+      <div class="winner-inner">
+        <div class="trophy-wrap">
+          <div class="trophy-icon" id="trophyIcon">&#x1F451;</div>
+          <div class="trophy-rays"></div>
+        </div>
+        <h2 class="winner-label">WINNER</h2>
+        <h1 class="winner-name" id="winnerName">Player</h1>
+        <p class="winner-subtitle">Survived the Danger Card!</p>
+        <div class="winner-stats" id="winnerStats"></div>
+        <button class="btn-primary" id="btnRestart">
+          <span>PLAY AGAIN</span>
+          <span class="btn-icon">&#x21BA;</span>
+        </button>
+        <button class="btn-ghost" id="btnMainMenu">Main Menu</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>
