@@ -7,6 +7,13 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#060a12" />
   <title>DANGER CARD — Elimination Game</title>
+
+  <!-- Favicon: custom bomb SVG — shows in Chrome tab, bookmarks, and PWA -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3C!-- dark background circle --%3E%3Ccircle cx='32' cy='32' r='32' fill='%23060a12'/%3E%3C!-- red outer glow ring --%3E%3Ccircle cx='32' cy='38' r='16' fill='none' stroke='%23ff2d55' stroke-width='1.5' opacity='0.5'/%3E%3C!-- bomb body --%3E%3Ccircle cx='32' cy='38' r='14' fill='%231a1a2e'/%3E%3Ccircle cx='32' cy='38' r='14' fill='url(%23bombGrad)'/%3E%3C!-- shine highlight --%3E%3Cellipse cx='27' cy='32' rx='4' ry='3' fill='white' opacity='0.15'/%3E%3C!-- fuse stem --%3E%3Crect x='31' y='18' width='3' height='8' rx='1.5' fill='%23a07830'/%3E%3C!-- fuse curl --%3E%3Cpath d='M32 18 Q38 12 42 16 Q46 20 42 22' fill='none' stroke='%23c89040' stroke-width='2.5' stroke-linecap='round'/%3E%3C!-- spark at fuse tip --%3E%3Ccircle cx='42' cy='22' r='3' fill='%23ffd60a'/%3E%3Ccircle cx='42' cy='22' r='1.8' fill='%23ff6b00'/%3E%3Ccircle cx='42' cy='22' r='1' fill='white'/%3E%3C!-- spark rays --%3E%3Cline x1='42' y1='18' x2='42' y2='16' stroke='%23ffd60a' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='45' y1='20' x2='47' y2='19' stroke='%23ffd60a' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='44' y1='24' x2='46' y2='25' stroke='%23ff6b00' stroke-width='1.2' stroke-linecap='round'/%3E%3C!-- gradient def --%3E%3Cdefs%3E%3CradialGradient id='bombGrad' cx='40%25' cy='35%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23303050'/%3E%3Cstop offset='100%25' stop-color='%230a0a18'/%3E%3C/radialGradient%3E%3C/defs%3E%3C/svg%3E" />
+
+  <!-- Apple touch icon (home screen on iOS) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23060a12'/%3E%3Ccircle cx='32' cy='38' r='14' fill='url(%23bombGrad)'/%3E%3Cellipse cx='27' cy='32' rx='4' ry='3' fill='white' opacity='0.15'/%3E%3Crect x='31' y='18' width='3' height='8' rx='1.5' fill='%23a07830'/%3E%3Cpath d='M32 18 Q38 12 42 16 Q46 20 42 22' fill='none' stroke='%23c89040' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='42' cy='22' r='3' fill='%23ffd60a'/%3E%3Ccircle cx='42' cy='22' r='1.5' fill='white'/%3E%3Cdefs%3E%3CradialGradient id='bombGrad' cx='40%25' cy='35%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23303050'/%3E%3Cstop offset='100%25' stop-color='%230a0a18'/%3E%3C/radialGradient%3E%3C/defs%3E%3C/svg%3E" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -15,7 +22,7 @@
 <body>
   <canvas id="bgCanvas"></canvas>
 
-  <!-- CONFIRM MODAL (shared) -->
+  <!-- CONFIRM MODAL -->
   <div id="confirmModal" class="modal-backdrop" style="display:none">
     <div class="modal-box glass-panel">
       <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -28,18 +35,57 @@
     </div>
   </div>
 
+  <!-- THEME MODAL -->
+  <div id="themeModal" class="modal-backdrop" style="display:none">
+    <div class="modal-box glass-panel theme-modal-box">
+      <h3 class="modal-title">🎨 CARD THEME</h3>
+      <p class="modal-msg">Choose your card style</p>
+      <div class="theme-grid" id="themeGrid"></div>
+      <button class="btn-modal-cancel" id="themeClose">Close</button>
+    </div>
+  </div>
+
+  <!-- DARE TWIST MODAL -->
+  <div id="dareModal" class="modal-backdrop" style="display:none">
+    <div class="modal-box glass-panel dare-modal-box">
+      <div class="dare-header">
+        <div class="dare-fire">🎭</div>
+        <h3 class="dare-title">DARE TWIST!</h3>
+      </div>
+      <p class="dare-player-label"><span id="darePlayerName">Player</span> must complete this dare:</p>
+      <div class="dare-card-box">
+        <p class="dare-text" id="dareText">Do something fun.</p>
+      </div>
+      <p class="dare-note">Complete the dare or let it go — no shame either way!</p>
+      <div class="modal-btns">
+        <button class="btn-modal-cancel" id="dareSkip">Skip It</button>
+        <button class="btn-dare-done" id="dareDone">✓ Done!</button>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
 
-    <!-- START SCREEN -->
+    <!-- ══ START SCREEN ══ -->
     <div id="screen-start" class="screen active">
       <div class="start-scroll">
         <div class="start-inner">
+
           <div class="logo-wrap">
             <div class="logo-icon-wrap">
-              <span class="logo-icon">💣</span>
+              <span class="logo-icon" id="logoEmoji">💣</span>
+              <div class="logo-glow-ring"></div>
             </div>
             <h1 class="logo-title">DANGER<span class="logo-card">CARD</span></h1>
             <p class="logo-tagline">Pick a card. Pray it's not the one.</p>
+          </div>
+
+          <div class="stats-bar glass-panel" id="statsBar" style="display:none">
+            <div class="stat-item"><span class="stat-num" id="statGamesPlayed">0</span><span class="stat-caption">Games</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><span class="stat-num" id="statTotalRounds">0</span><span class="stat-caption">Rounds</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><span class="stat-num" id="statBombsEscaped">0</span><span class="stat-caption">Escapes</span></div>
           </div>
 
           <div class="setup-card glass-panel">
@@ -53,31 +99,53 @@
               <button class="count-btn" id="btnIncCount">+</button>
             </div>
             <div id="nameInputs" class="name-inputs"></div>
-            <button class="btn-primary" id="btnStart">
-              <span>START GAME</span>
-              <span class="btn-icon">&#x25B6;</span>
-            </button>
+
+            <div class="mode-row">
+              <label class="field-label" style="margin-bottom:0">GAME MODE</label>
+              <div class="mode-pills" id="modePills">
+                <button class="mode-pill active" data-mode="classic">Classic</button>
+                <button class="mode-pill" data-mode="blitz">⚡ Blitz</button>
+                <button class="mode-pill" data-mode="sudden">💀 Sudden</button>
+                <button class="mode-pill" data-mode="hotseat">🔥 Hot Seat</button>
+              </div>
+              <p class="mode-desc" id="modeDesc">Standard rules — last player standing wins.</p>
+            </div>
+
+            <div class="start-row">
+              <button class="btn-primary" id="btnStart">
+                <span>START GAME</span>
+                <span class="btn-icon">▶</span>
+              </button>
+              <button class="btn-icon-sq" id="btnTheme" title="Card Theme">🎨</button>
+            </div>
           </div>
 
           <div class="leaderboard-wrap glass-panel" id="leaderboardPanel">
-            <h3 class="lb-title">&#x1F3C6; WIN HISTORY</h3>
+            <div class="lb-header">
+              <h3 class="lb-title">🏆 WIN HISTORY</h3>
+              <button class="btn-icon-sq btn-icon-sm" id="btnClearHistory" title="Clear history">🗑️</button>
+            </div>
             <div id="leaderboardList" class="lb-list"></div>
-            <button class="btn-ghost btn-danger-ghost" id="btnClearHistory">Clear History</button>
           </div>
+
+          <div class="footer-links">
+            <span class="footer-version">v4.0 · DANGER CARD</span>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- PLAYER TURN SCREEN -->
+    <!-- ══ PLAYER TURN SCREEN ══ -->
     <div id="screen-turn" class="screen">
       <div class="turn-header">
         <div class="turn-header-top">
           <div class="round-badge" id="roundBadge">ROUND 1</div>
-          <div class="cards-info-badge" id="cardsInfoBadge">3 CARDS &middot; 1 BOMB</div>
-          <button class="btn-exit-game" id="btnExitTurn" title="Exit game">&#x2715;</button>
+          <div class="cards-info-badge" id="cardsInfoBadge">3 CARDS · 1 BOMB</div>
+          <button class="btn-exit-game" id="btnExitTurn" title="Exit game">✕</button>
         </div>
         <h2 class="turn-title" id="turnTitle">Player's Turn</h2>
-        <p class="turn-subtitle">Choose your card wisely&hellip;</p>
+        <p class="turn-subtitle" id="turnSubtitle">Choose your card wisely…</p>
         <div class="players-remaining" id="playersRemaining"></div>
       </div>
       <div class="cards-area" id="cardsArea"></div>
@@ -86,58 +154,75 @@
       </div>
     </div>
 
-    <!-- PASS DEVICE SCREEN -->
+    <!-- ══ PASS DEVICE SCREEN ══ -->
     <div id="screen-pass" class="screen">
-      <button class="btn-exit-game btn-exit-float" id="btnExitPass" title="Exit game">&#x2715;</button>
+      <button class="btn-exit-game btn-exit-float" id="btnExitPass" title="Exit game">✕</button>
       <div class="pass-inner">
-        <div class="pass-icon">&#x1F4F1;</div>
+        <div class="pass-anim-wrap">
+          <div class="pass-icon">📱</div>
+          <div class="pass-arrows">
+            <span class="pa pa1">›</span>
+            <span class="pa pa2">›</span>
+            <span class="pa pa3">›</span>
+          </div>
+        </div>
         <h2 class="pass-title">PASS THE PHONE</h2>
         <p class="pass-subtitle" id="passSubtitle">Hand it to the next player</p>
         <div class="pass-player" id="passNextPlayer"></div>
+        <div class="pass-tip">Cover the screen while passing</div>
         <button class="btn-primary btn-ready" id="btnReady">
-          <span>READY</span>
-          <span class="btn-icon">&#x2713;</span>
+          <span>I'M READY</span>
+          <span class="btn-icon">✓</span>
         </button>
       </div>
     </div>
 
-    <!-- REVEAL SCREEN -->
+    <!-- ══ REVEAL SCREEN ══ -->
     <div id="screen-reveal" class="screen">
       <div class="reveal-header">
         <div class="reveal-header-top">
           <div class="round-badge" id="revealRoundBadge">ROUND 1</div>
-          <button class="btn-exit-game" id="btnExitReveal" title="Exit game">&#x2715;</button>
+          <div class="reveal-mode-tag" id="revealModeTag"></div>
+          <button class="btn-exit-game" id="btnExitReveal" title="Exit game">✕</button>
         </div>
         <h2 class="reveal-title" id="revealTitle">REVEALING CARDS</h2>
+        <div class="reveal-suspense-bar" id="suspenseBar">
+          <div class="reveal-suspense-fill" id="suspenseFill"></div>
+        </div>
       </div>
       <div class="reveal-cards-area" id="revealCardsArea"></div>
       <div class="reveal-result" id="revealResult">
         <div class="explosion-ring" id="explosionRing"></div>
+        <div class="explosion-sparks" id="explosionSparks"></div>
         <div class="eliminated-msg" id="eliminatedMsg"></div>
       </div>
       <button class="btn-primary btn-continue" id="btnContinue" style="display:none">
         <span id="continueLabel">NEXT ROUND</span>
-        <span class="btn-icon">&#x2192;</span>
+        <span class="btn-icon">→</span>
       </button>
     </div>
 
-    <!-- WINNER SCREEN -->
+    <!-- ══ WINNER SCREEN ══ -->
     <div id="screen-winner" class="screen">
       <canvas id="confettiCanvas"></canvas>
       <div class="winner-inner">
         <div class="trophy-wrap">
-          <div class="trophy-icon" id="trophyIcon">&#x1F451;</div>
           <div class="trophy-rays"></div>
+          <div class="trophy-icon" id="trophyIcon">👑</div>
         </div>
-        <h2 class="winner-label">WINNER</h2>
+        <div class="winner-crown-text">WINNER</div>
         <h1 class="winner-name" id="winnerName">Player</h1>
         <p class="winner-subtitle">Survived the Danger Card!</p>
         <div class="winner-stats" id="winnerStats"></div>
-        <button class="btn-primary" id="btnRestart">
-          <span>PLAY AGAIN</span>
-          <span class="btn-icon">&#x21BA;</span>
-        </button>
-        <button class="btn-ghost" id="btnMainMenu">Main Menu</button>
+        <div class="winner-recap" id="winnerRecap"></div>
+        <div class="winner-eliminated-list" id="winnerEliminatedList"></div>
+        <div class="winner-btns">
+          <button class="btn-primary" id="btnRestart">
+            <span>PLAY AGAIN</span>
+            <span class="btn-icon">↺</span>
+          </button>
+          <button class="btn-ghost" id="btnMainMenu">Main Menu</button>
+        </div>
       </div>
     </div>
 
